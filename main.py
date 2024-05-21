@@ -34,18 +34,17 @@ class Total():
 
     def update(self, add, screen):
         """数値を更新"""
-        self.sum += add
-        self.total = int(self.sum)
+        self.sum += add  # 今回増える分量の加算（減産はほかのものが出そろってから）
+        self.total = int(self.sum)  # int表示
         total = 0
         if self.total < 10000:
             total = self.total
             self.img = self.fonto.render(f"{total}:崛起ー", 0, self.color)
-            screen.blit(self.img, self.centery)
-        elif self.total >= 10000:
+        elif self.total >= 10000:  # 本家を見習って表示変更（必要なら億も実装）
             total = round(self.total/10000, 4)
             self.img = self.fonto.render(f"{total}万:崛起ー", 0, self.color)
-            screen.blit(self.img, self.centery)
-        pass
+        screen.blit(self.img, self.centery)
+        
 
 
 def main():
@@ -72,13 +71,13 @@ def main():
         screen.blit(txt, [300, 200])
         screen.blit(enn, [100, 400])
 
-        key_lst = pg.key.get_pressed()
-        if key_lst[pg.K_SPACE]:
-            add += 100
+        key_lst = pg.key.get_pressed()  # テスト用
+        if key_lst[pg.K_SPACE]:  # テスト用
+            add += 100  # テスト用
 
-        total.update(add, screen)
-        add = 0
+        total.update(add, screen)  # クッキーの合計量の更新
         pg.display.update()
+        add = 0  # 加算分を0にリセット
         tmr += 1        
         clock.tick(60)
 
