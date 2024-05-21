@@ -1,59 +1,69 @@
-# 初期化
-
 import os
 import sys
 import pygame as pg
+import math
+import random
+import time
 
+WIDTH, HEIGHT = 1280,720
 os.chdir(os.path.dirname(os.path.abspath(__file__)))
 
-class Player():
+class Player(pg.sprite.Sprite):
     '''プレイヤー'''
     def __init__(self) -> None:
         pass
     def dummy(self):
         pass
 
-class Reinforcement():
+class Reinforcement(pg.sprite.Sprite):
     '''強化欄'''
-    def __init__(self) -> None:
+    def __init__(self,) -> None:
         pass
     def dummy(self):
+        pass
+    def update(self):
         pass
 
 class Total():
     '''現在の総数'''
     def __init__(self) -> None:
-        pass
+        self.value = 0
     def dummy(self):
         pass
 
 
 def main():
     pg.display.set_caption("ななしのげーむ（仮）")
-    screen = pg.display.set_mode((1280,720))
+    screen = pg.display.set_mode((WIDTH,HEIGHT))
+    bg_img = pg.image.load(f"image/dummy_0.png")
+    total = Total()
+    total.value = 10000
     player = Player()
     r_block = Reinforcement()
-    total = Total()
+    timer = 0
     clock = pg.time.Clock()
-    font = pg.font.Font(None, 80)
 
-    enn = pg.Surface((20, 20))
-    pg.draw.circle(enn, (255, 0, 0), (10, 10), 10)
-    enn.set_colorkey((0, 0, 0))
-
-    tmr = 0
     while True:
+        key_lst = pg.key.get_pressed()
         for event in pg.event.get():
-            if event.type == pg.QUIT: return
-        
-        txt = font.render(str(tmr), True, (255, 255, 255))
-        screen.fill((50, 50, 50))
-        screen.blit(txt, [300, 200])
-        screen.blit(enn, [100, 400])
-        pg.display.update()
-        tmr += 1        
-        clock.tick(60)
+            if event.type == pg.QUIT:
+                return 0
+            if event.type == pg.KEYDOWN:
 
+                if event.key == pg.K_z:
+                    total.value -= 1
+                    print(total.value)
+                if event.key == pg.K_x:
+                    total.value += 1
+                    print(total.value)
+        screen.blit(bg_img,[0,0])
+
+        # player.update(screen)
+        # r_block.update(screen)
+        # total.update(screen)
+        pg.display.update()
+        timer += 1
+        clock.tick(60)
 
 if __name__ == "__main__":
     pg.init()
