@@ -24,7 +24,7 @@ class Reinforcement(pg.sprite.Sprite):
     def update(self):
         pass
 
-class Total():
+class Total():  # ここ
     '''現在の総数'''
     def __init__(self) -> None:
         """変数の初期化"""
