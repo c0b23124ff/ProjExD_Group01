@@ -76,6 +76,20 @@ class Total:
     def dummy(self):
         pass
 
+class FallingImage(pg.sprite.Sprite):
+    def __init__(self, image_path):
+        super().__init__()
+        self.original_image = pg.image.load(image_path)
+        self.image = pg.transform.scale(self.original_image,(self.original_image.get_width()//10,self.original_image.get_height()//10))
+        self.rect = self.image.get_rect()
+        self.rect.x = random.randint(0, (WIDTH//2)-self.rect.width)
+        self.rect.y = -self.rect.height
+
+    def update(self):
+        self.rect.y += 5
+        if self.rect.y > HEIGHT:
+            self.kill()
+
 
 def main():
     pg.display.set_caption("ななしのげーむ（仮）")
@@ -90,6 +104,7 @@ def main():
         r_blocks.add(Reinforcement(WIDTH/4*3,100+y*125,q,w,e))
     timer = 0
     clock = pg.time.Clock()
+    falling_images = pg.sprite.Group()
 
     while True:
         key_lst = pg.key.get_pressed()
@@ -109,11 +124,7 @@ def main():
                         total.value -= r_block.counter(total.value)
                         print(total.value,r_block.y)
                 print(f"mouse moved -> ({x},{y})")
-        screen.blit(bg_img,[0,0])
-
-
-
-
+        
         # player.update(screen)
         total_sum = 0
         for r_block in r_blocks:
@@ -127,6 +138,15 @@ def main():
         timer += 1
         clock.tick(FRAMERATE)
         print(total.value)
+
+        spawn_probability = min(0.1+(total_sum/1000) **2,10)
+        if random.random() < spawn_probability:
+            new_image = FallingImage("image/dummy_2.png")
+            falling_images.add(new_image)
+        
+        falling_images.update()
+        screen.blit(bg_img,[0,0])
+        falling_images.draw(screen)
 
 if __name__ == "__main__":
     pg.init()
