@@ -6,8 +6,8 @@ import random
 import time
 
 WIDTH,HEIGHT = 1280,720
-os.chdir(os.path.dirname(os.path.abspath(__file__)))
 FRAMERATE = 60
+os.chdir(os.path.dirname(os.path.abspath(__file__)))
 
 class Player(pg.sprite.Sprite):
     '''プレイヤー'''
@@ -16,12 +16,11 @@ class Player(pg.sprite.Sprite):
     def dummy(self):
         pass
 
-
 class Reinforcement(pg.sprite.Sprite):
     '''
     total_output -> totalを入れる
     timer_clock -> フレーム
-    total_input -> 
+    total_input -> 消費する量
     '''
     def __init__(self,x,y,total_output,timer_clock,total_input) -> None:
         super().__init__()
@@ -70,7 +69,6 @@ class Reinforcement(pg.sprite.Sprite):
         screen.blit(self.text_input,self.rect_text_input)
         screen.blit(self.text_output,self.rect_text_output)
 
-
 class Total():  # ここ
     '''現在の総数'''
     def __init__(self) -> None:
@@ -78,7 +76,7 @@ class Total():  # ここ
         self.fonto = pg.font.SysFont("hgp創英角ﾎﾟｯﾌﾟ体", 30)
         self.color = (255, 255, 255)
         self.sum = 0
-        self.total = int(self.sum)
+        self.total = 0
         self.img = self.fonto.render(f"{self.total}:崛起ー", 0, self.color)
         self.centery = (200, 120)
 
@@ -93,14 +91,15 @@ class Total():  # ここ
             total = round(self.total/10000, 4)
             self.img = self.fonto.render(f"{total}万:崛起ー", 0, self.color)
         screen.blit(self.img, self.centery)
-        
+
 
 def main():
     pg.display.set_caption("ななしのげーむ（仮）")
     screen = pg.display.set_mode((WIDTH,HEIGHT))
     bg_img = pg.image.load(f"image/dummy_0.png")
     total = Total()
-    total.value = int(10000)
+    total.value = 10000
+    total_sum = 0
     player = Player()
     reinforcement_list = [[5,FRAMERATE,1],[20,FRAMERATE/2,1],[100,FRAMERATE/6,1],[1000,1,1]]
     r_blocks = pg.sprite.Group()
@@ -108,8 +107,7 @@ def main():
         r_blocks.add(Reinforcement(WIDTH/4*3,100+y*125,q,w,e))
     timer = 0
     clock = pg.time.Clock()
-    font = pg.font.Font(None, 80)
-    total_sum = 0
+    font = pg.font.Font(None,80)
 
     while True:
         key_lst = pg.key.get_pressed()
@@ -130,24 +128,22 @@ def main():
                         print(total.value,r_block.y)
                 print(f"mouse moved -> ({x},{y})")
         screen.blit(bg_img,[0,0])
-        txt = font.render(str(timer), True, (255, 255, 255))
-        screen.fill((50, 50, 50))
+        txt = font.render("Timer:"+str(int(timer/FRAMERATE)), True, (255, 255, 255))
         screen.blit(txt, [300, 200])
 
+        total_sum = 0
         for r_block in r_blocks:
             if timer % r_block.timer_clock == 0:
                 total_sum += r_block.total_input * r_block.object_number
+        total.value += total_sum
 
         # player.update(screen)
-        
         r_blocks.draw(screen)
         r_blocks.update(screen)
-        total.update(total_sum, screen)  # クッキーの合計量の更新
+        total.update(total.value,screen)  # クッキーの合計量の更新
         pg.display.update()
         timer += 1
-        clock.tick(60)
         clock.tick(FRAMERATE)
-        print(total_sum)
 
 if __name__ == "__main__":
     pg.init()
