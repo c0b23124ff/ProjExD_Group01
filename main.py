@@ -186,6 +186,7 @@ def main():
                         player.change_img(screen)
                 print(f"mouse moved -> ({mouseX},{mouseY})")
         screen.blit(bg_img,[0,0])
+        screen.fill((50, 50, 50), rect = (0,0,640,720))
         txt = font.render("Timer:"+str(int(timer/FRAMERATE)), True, (255, 255, 255))
         screen.blit(txt, [100,50])
 
