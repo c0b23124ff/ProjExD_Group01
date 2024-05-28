@@ -1,9 +1,7 @@
 import os
 import sys
 import pygame as pg
-import math
 import random
-import time
 
 WIDTH,HEIGHT = 1280,720
 FRAMERATE = 60
