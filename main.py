@@ -18,7 +18,7 @@ class Player():
         self.size = defsize
         #self.img=pg.Surface((2*defsize, 2*defsize))
         #pg.draw.circle(self.img, (150,130,100), (defsize, defsize), defsize)
-        self.img = pg.transform.rotozoom(pg.image.load(f"image/dummy_{2}.png"), 0, self.size)
+        self.img = pg.transform.rotozoom(pg.image.load(f"image/Click_Image.png"), 0, self.size)
         self.img.set_colorkey((0, 0, 0))
         self.rct: pg.Rect = self.img.get_rect()
         self.rct.center = (320,360)
@@ -26,14 +26,14 @@ class Player():
     def change_img(self,screen): #クリックされたときsizeを50
         self.size = self.defsize+0.1 #大きくする
 
-    def update(self,screen): 
+    def update(self,screen,score): 
         if self.size > self.defsize:
             self.size -= 0.01
         else:
             self.size = self.defsize
         #self.img=pg.Surface((2*self.size, 2*self.size))
         #pg.draw.circle(self.img, (150,130,100), (self.size, self.size), self.size)
-        self.img = pg.transform.rotozoom(pg.image.load(f"image/dummy_{2}.png"), 0, self.size)
+        self.img = pg.transform.rotozoom(pg.image.load(f"image/Click_Image.png"), 0, self.size+score/1000)
         self.img.set_colorkey((0, 0, 0))
         self.rct: pg.Rect = self.img.get_rect()
         self.rct.center = (320,360)
@@ -132,7 +132,7 @@ class FallingImage(pg.sprite.Sprite):
     def __init__(self, image_path):
         super().__init__()
         self.original_image = pg.image.load(image_path)
-        self.image = pg.transform.scale(self.original_image,(self.original_image.get_width()//10,self.original_image.get_height()//10))
+        self.image = pg.transform.scale(self.original_image,(self.original_image.get_width()//2,self.original_image.get_height()//2))
         self.rect = self.image.get_rect()
         self.rect.x = random.randint(0, (WIDTH//2)-self.rect.width)
         self.rect.y = -self.rect.height
@@ -144,17 +144,17 @@ class FallingImage(pg.sprite.Sprite):
 
 
 def main():
-    pg.display.set_caption("ななしのげーむ（仮）")
+    pg.display.set_caption("こうかとんおんなのこはべらせクリッカー")
     screen = pg.display.set_mode((WIDTH,HEIGHT))
-    bg_img = pg.image.load(f"image/dummy_0.png")
+    bg_img = pg.image.load(f"image/background.jpg")
     falling_images = pg.sprite.Group()
-    player = Player(0.5)
+    player = Player(2)
     reinforcement_list = [["finger",5,FRAMERATE,1],["Finger?",20,FRAMERATE/2,1],["GOD!",100,FRAMERATE/6,1],["Death;)",1000,1,1]]
     r_blocks = pg.sprite.Group()
     for y,(q,w,e,r) in zip(range(len(reinforcement_list)),reinforcement_list):
         r_blocks.add(Reinforcement(q,y,WIDTH/4*3,100+y*125,w,e,r))
     total = Total()
-    total.value = 100000000
+    total.value = 0
     total_sum = 0
     timer = 0
     clock = pg.time.Clock()
@@ -184,10 +184,6 @@ def main():
                         total.value += 1
                         player.change_img(screen)
                 print(f"mouse moved -> ({mouseX},{mouseY})")
-        screen.blit(bg_img,[0,0])
-        screen.fill((50, 50, 50), rect = (0,0,640,720))
-        txt = font.render("Timer:"+str(int(timer/FRAMERATE)), True, (255, 255, 255))
-        screen.blit(txt, [100,50])
 
         total_sum = 0
         for r_block in r_blocks:
@@ -197,13 +193,14 @@ def main():
 
         spawn_probability = min(0.1+(total_sum/1000) **2,10)
         if random.random() < spawn_probability:
-            new_image = FallingImage("image/dummy_2.png")
+            new_image = FallingImage(f"image/fall/{random.randint(1,10)}.png")
             falling_images.add(new_image)
         
         screen.blit(bg_img,(0,0))
+        screen.fill((50, 50, 50), rect = (WIDTH/2,0,WIDTH,HEIGHT))
         falling_images.update()
         falling_images.draw(screen)
-        player.update(screen)
+        player.update(screen,total.value)
         r_blocks.update(screen)
         txt = font.render("Timer:"+str(int(timer/FRAMERATE)), True, (255, 255, 255))
         screen.blit(txt,(100,50))
