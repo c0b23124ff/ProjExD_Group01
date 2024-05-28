@@ -143,24 +143,22 @@ class FallingImage(pg.sprite.Sprite):
             self.kill()
 
 
-
-
 def main():
     pg.display.set_caption("ななしのげーむ（仮）")
-    player = Player(0.5)
     screen = pg.display.set_mode((WIDTH,HEIGHT))
     bg_img = pg.image.load(f"image/dummy_0.png")
-    total = Total()
-    total.value = 100000000
-    total_sum = 0
+    falling_images = pg.sprite.Group()
+    player = Player(0.5)
     reinforcement_list = [["finger",5,FRAMERATE,1],["Finger?",20,FRAMERATE/2,1],["GOD!",100,FRAMERATE/6,1],["Death;)",1000,1,1]]
     r_blocks = pg.sprite.Group()
     for y,(q,w,e,r) in zip(range(len(reinforcement_list)),reinforcement_list):
         r_blocks.add(Reinforcement(q,y,WIDTH/4*3,100+y*125,w,e,r))
+    total = Total()
+    total.value = 100000000
+    total_sum = 0
     timer = 0
     clock = pg.time.Clock()
     font = pg.font.Font(None,80)
-    falling_images = pg.sprite.Group()
 
     while True:
         key_lst = pg.key.get_pressed()
@@ -181,13 +179,11 @@ def main():
                         total.value -= r_block.counter(total.value)
                         print(total.value,r_block.y)
                 if 220<= mouseX and mouseX <= 420: #xのあたり範囲　ターゲットの中心320,360
-                    if 260<= mouseY and mouseY <= 460: #yのあたり範囲
-                        #当たった時の処理
+                    if 260<= mouseY and mouseY <= 460: # yのあたり範囲
+                        # マウスクリック
+                        total.value += 1
                         player.change_img(screen)
                 print(f"mouse moved -> ({mouseX},{mouseY})")
-        screen.blit(bg_img,[0,0])
-        txt = font.render("Timer:"+str(int(timer/FRAMERATE)), True, (255, 255, 255))
-        screen.blit(txt, [100,50])
 
         total_sum = 0
         for r_block in r_blocks:
@@ -200,10 +196,13 @@ def main():
             new_image = FallingImage("image/dummy_2.png")
             falling_images.add(new_image)
         
+        screen.blit(bg_img,(0,0))
         falling_images.update()
         falling_images.draw(screen)
         player.update(screen)
         r_blocks.update(screen)
+        txt = font.render("Timer:"+str(int(timer/FRAMERATE)), True, (255, 255, 255))
+        screen.blit(txt,(100,50))
         total.update(total.value,screen)  # クッキーの合計量の更新
         timer += 1
         clock.tick(FRAMERATE)
