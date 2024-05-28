@@ -26,7 +26,7 @@ class Reinforcement(pg.sprite.Sprite):
         self.font = pg.font.SysFont("hgp創英角ﾎﾟｯﾌﾟ体",25)
         # box
         self.image_box = pg.Surface((WIDTH/2-200,100))
-        pg.draw.rect(self.image_box,(0,0,0),(WIDTH/2-200,0,WIDTH/2+200,100))
+        pg.draw.rect(self.image_box,(55,55,55),(WIDTH/2-200,0,WIDTH/2+200,100))
         self.rect_box = self.image_box.get_rect()
         self.rect_box.center = x,y
         # Image
@@ -34,7 +34,7 @@ class Reinforcement(pg.sprite.Sprite):
         self.rect_image = self.image_image.get_rect()
         self.rect_image.center = x-150,y
         # name
-        self.font = pg.font.Font(None,75)
+        self.font = pg.font.Font(None,50)
         self.text_name = self.font.render(str(self.name), True, (255, 255, 255))
         self.rect_text_name = self.text_name.get_rect()
         # output
@@ -114,7 +114,7 @@ def main():
     total.value = 100000000
     total_sum = 0
     player = Player()
-    reinforcement_list = [["ゆび",5,FRAMERATE,1],["ユビ",20,FRAMERATE/2,1],["かみ",100,FRAMERATE/6,1],["死ね！",1000,1,1]]
+    reinforcement_list = [["finger",5,FRAMERATE,1],["Finger?",20,FRAMERATE/2,1],["GOD!",100,FRAMERATE/6,1],["Death;)",1000,1,1]]
     r_blocks = pg.sprite.Group()
     for y,(q,w,e,r) in zip(range(len(reinforcement_list)),reinforcement_list):
         r_blocks.add(Reinforcement(q,y,WIDTH/4*3,100+y*125,w,e,r))
