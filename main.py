@@ -158,16 +158,13 @@ def main():
                 print(f"mouse moved -> ({x},{y})")
         screen.blit(bg_img,[0,0])
         txt = font.render("Timer:"+str(int(timer/FRAMERATE)), True, (255, 255, 255))
-        screen.blit(txt, [300, 200])
+        screen.blit(txt, [100,50])
 
-        
-        # player.update(screen)
         total_sum = 0
         for r_block in r_blocks:
             if timer % r_block.timer_clock == 0:
                 total_sum += r_block.total_input * r_block.object_number
         total.value += total_sum
-
 
         spawn_probability = min(0.1+(total_sum/1000) **2,10)
         if random.random() < spawn_probability:
@@ -182,7 +179,6 @@ def main():
         timer += 1
         clock.tick(FRAMERATE)
         pg.display.update()
-        screen.blit(bg_img,[0,0])
 
 if __name__ == "__main__":
     pg.init()
