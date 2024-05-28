@@ -9,12 +9,35 @@ WIDTH,HEIGHT = 1280,720
 FRAMERATE = 60
 os.chdir(os.path.dirname(os.path.abspath(__file__)))
 
-class Player(pg.sprite.Sprite):
-    '''プレイヤー'''
-    def __init__(self) -> None:
-        pass
-    def dummy(self):
-        pass
+class Player():
+    '''クリック対象の作成
+    中心は320,360
+    クリック判定はmain'''
+    def __init__(self,defsize :float):
+        self.defsize =defsize
+        self.size = defsize
+        #self.img=pg.Surface((2*defsize, 2*defsize))
+        #pg.draw.circle(self.img, (150,130,100), (defsize, defsize), defsize)
+        self.img = pg.transform.rotozoom(pg.image.load(f"image/dummy_{2}.png"), 0, self.size)
+        self.img.set_colorkey((0, 0, 0))
+        self.rct: pg.Rect = self.img.get_rect()
+        self.rct.center = (320,360)
+    
+    def change_img(self,screen): #クリックされたときsizeを50
+        self.size = self.defsize+0.1 #大きくする
+
+    def update(self,screen): 
+        if self.size > self.defsize:
+            self.size -= 0.01
+        else:
+            self.size = self.defsize
+        #self.img=pg.Surface((2*self.size, 2*self.size))
+        #pg.draw.circle(self.img, (150,130,100), (self.size, self.size), self.size)
+        self.img = pg.transform.rotozoom(pg.image.load(f"image/dummy_{2}.png"), 0, self.size)
+        self.img.set_colorkey((0, 0, 0))
+        self.rct: pg.Rect = self.img.get_rect()
+        self.rct.center = (320,360)
+        screen.blit(self.img, self.rct) 
 
 class Reinforcement(pg.sprite.Sprite):
     '''
@@ -120,14 +143,16 @@ class FallingImage(pg.sprite.Sprite):
             self.kill()
 
 
+
+
 def main():
     pg.display.set_caption("ななしのげーむ（仮）")
+    player = Player(0.5)
     screen = pg.display.set_mode((WIDTH,HEIGHT))
     bg_img = pg.image.load(f"image/dummy_0.png")
     total = Total()
     total.value = 100000000
     total_sum = 0
-    player = Player()
     reinforcement_list = [["finger",5,FRAMERATE,1],["Finger?",20,FRAMERATE/2,1],["GOD!",100,FRAMERATE/6,1],["Death;)",1000,1,1]]
     r_blocks = pg.sprite.Group()
     for y,(q,w,e,r) in zip(range(len(reinforcement_list)),reinforcement_list):
@@ -150,12 +175,16 @@ def main():
                     total.value += 1
                 print(total.value)
             if event.type == pg.MOUSEBUTTONDOWN:
-                x,y = event.pos
+                mouseX,mouseY = event.pos
                 for r_block in r_blocks:
                     if r_block.check(event.pos):
                         total.value -= r_block.counter(total.value)
                         print(total.value,r_block.y)
-                print(f"mouse moved -> ({x},{y})")
+                if 220<= mouseX and mouseX <= 420: #xのあたり範囲　ターゲットの中心320,360
+                    if 260<= mouseY and mouseY <= 460: #yのあたり範囲
+                        #当たった時の処理
+                        player.change_img(screen)
+                print(f"mouse moved -> ({mouseX},{mouseY})")
         screen.blit(bg_img,[0,0])
         txt = font.render("Timer:"+str(int(timer/FRAMERATE)), True, (255, 255, 255))
         screen.blit(txt, [100,50])
@@ -173,7 +202,7 @@ def main():
         
         falling_images.update()
         falling_images.draw(screen)
-        # player.update(screen)
+        player.update(screen)
         r_blocks.update(screen)
         total.update(total.value,screen)  # クッキーの合計量の更新
         timer += 1
