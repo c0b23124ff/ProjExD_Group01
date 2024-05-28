@@ -92,6 +92,20 @@ class Total():  # ここ
             self.img = self.fonto.render(f"{total}万:崛起ー", 0, self.color)
         screen.blit(self.img, self.centery)
 
+class FallingImage(pg.sprite.Sprite):
+    def __init__(self, image_path):
+        super().__init__()
+        self.original_image = pg.image.load(image_path)
+        self.image = pg.transform.scale(self.original_image,(self.original_image.get_width()//10,self.original_image.get_height()//10))
+        self.rect = self.image.get_rect()
+        self.rect.x = random.randint(0, (WIDTH//2)-self.rect.width)
+        self.rect.y = -self.rect.height
+
+    def update(self):
+        self.rect.y += 5
+        if self.rect.y > HEIGHT:
+            self.kill()
+
 
 def main():
     pg.display.set_caption("ななしのげーむ（仮）")
@@ -108,6 +122,7 @@ def main():
     timer = 0
     clock = pg.time.Clock()
     font = pg.font.Font(None,80)
+    falling_images = pg.sprite.Group()
 
     while True:
         key_lst = pg.key.get_pressed()
@@ -131,19 +146,30 @@ def main():
         txt = font.render("Timer:"+str(int(timer/FRAMERATE)), True, (255, 255, 255))
         screen.blit(txt, [300, 200])
 
+        
+        # player.update(screen)
         total_sum = 0
         for r_block in r_blocks:
             if timer % r_block.timer_clock == 0:
                 total_sum += r_block.total_input * r_block.object_number
         total.value += total_sum
 
+
+        spawn_probability = min(0.1+(total_sum/1000) **2,10)
+        if random.random() < spawn_probability:
+            new_image = FallingImage("image/dummy_2.png")
+            falling_images.add(new_image)
+        
+        falling_images.update()
+        falling_images.draw(screen)
         # player.update(screen)
         r_blocks.draw(screen)
         r_blocks.update(screen)
         total.update(total.value,screen)  # クッキーの合計量の更新
-        pg.display.update()
         timer += 1
         clock.tick(FRAMERATE)
+        pg.display.update()
+        screen.blit(bg_img,[0,0])
 
 if __name__ == "__main__":
     pg.init()
