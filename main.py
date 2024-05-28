@@ -109,12 +109,12 @@ class Total():  # ここ
     '''現在の総数'''
     def __init__(self) -> None:
         """変数の初期化"""
-        self.fonto = pg.font.SysFont("hgp創英角ﾎﾟｯﾌﾟ体", 30)
+        self.fonto = pg.font.SysFont("hgp創英角ﾎﾟｯﾌﾟ体", 75)
         self.color = (255, 255, 255)
         self.sum = 0
         self.total = 0
         self.img = self.fonto.render(f"{self.total}:崛起ー", 0, self.color)
-        self.centery = (200, 120)
+        self.centery = (WIDTH/4/2, 120)
 
     def update(self, total, screen):
         """数値を更新"""
@@ -122,17 +122,17 @@ class Total():  # ここ
         total = 0
         if self.total < 10000:
             total = self.total
-            self.img = self.fonto.render(f"{total}:崛起ー", 0, self.color)
+            self.img = self.fonto.render(f"{total}:スコア", 0, self.color)
         elif self.total >= 10000:  # 本家を見習って表示変更（必要なら億も実装）
             total = round(self.total/10000, 4)
-            self.img = self.fonto.render(f"{total}万:崛起ー", 0, self.color)
+            self.img = self.fonto.render(f"{total}万:スコア", 0, self.color)
         screen.blit(self.img, self.centery)
 
 class FallingImage(pg.sprite.Sprite):
     def __init__(self, image_path):
         super().__init__()
         self.original_image = pg.image.load(image_path)
-        self.image = pg.transform.scale(self.original_image,(self.original_image.get_width()//2,self.original_image.get_height()//2))
+        self.image = pg.transform.scale(self.original_image,(self.original_image.get_width()//5,self.original_image.get_height()//5))
         self.rect = self.image.get_rect()
         self.rect.x = random.randint(0, (WIDTH//2)-self.rect.width)
         self.rect.y = -self.rect.height
@@ -144,7 +144,7 @@ class FallingImage(pg.sprite.Sprite):
 
 
 def main():
-    pg.display.set_caption("こうかとんおんなのこはべらせクリッカー")
+    pg.display.set_caption("こうかとんクリッカー")
     screen = pg.display.set_mode((WIDTH,HEIGHT))
     bg_img = pg.image.load(f"image/background.jpg")
     falling_images = pg.sprite.Group()
@@ -193,7 +193,7 @@ def main():
 
         spawn_probability = min(0.1+(total_sum/1000) **2,10)
         if random.random() < spawn_probability:
-            new_image = FallingImage(f"image/fall/{random.randint(1,10)}.png")
+            new_image = FallingImage(f"image/fall/{random.randint(1,2)}.png")
             falling_images.add(new_image)
         
         screen.blit(bg_img,(0,0))
@@ -202,8 +202,7 @@ def main():
         falling_images.draw(screen)
         player.update(screen,total.value)
         r_blocks.update(screen)
-        txt = font.render("Timer:"+str(int(timer/FRAMERATE)), True, (255, 255, 255))
-        screen.blit(txt,(100,50))
+        screen.blit(font.render("Timer:"+str(int(timer/FRAMERATE)), True, (255, 255, 255)),(50,50))
         total.update(total.value,screen)  # クッキーの合計量の更新
         timer += 1
         clock.tick(FRAMERATE)
